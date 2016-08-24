@@ -1,0 +1,11 @@
+{
+    "name": "webtales/alambic-connector-diffbot",
+    "require": {
+        "php": ">=5.5.0",
+        "php-http/guzzle6-adapter": "*",
+        "swader/diffbot-php-client": "*"
+    },
+    "autoload": {
+        "psr-0": { "AlambicDiffbotConnector": "src/" }
+    }
+}
