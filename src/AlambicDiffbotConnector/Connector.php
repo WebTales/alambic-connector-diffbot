@@ -15,20 +15,66 @@ class Connector
         }
         $configs=isset($payload["configs"]) ? $payload["configs"] : [];
         $baseConfig=isset($payload["connectorBaseConfig"]) ? $payload["connectorBaseConfig"] : [];
+        $collection=!empty($configs["collection"]) ? $configs["collection"] : null;
+        if(!$collection&&!empty($baseConfig["collection"])){
+            $collection=$baseConfig["collection"];
+        }
         if(empty($baseConfig["token"])&&empty($configs["token"])){
             throw new Exception('Token required');
         }
         $token=!empty($configs["token"]) ? $configs["token"] : $baseConfig["token"];
         $diffbot = new Diffbot($token);
-        return $payload["isMutation"] ? $this->execute($payload,$diffbot) : $this->resolve($payload,$diffbot);
+        return $payload["isMutation"] ? $this->execute($payload,$diffbot,$collection) : $this->resolve($payload,$diffbot,$collection);
     }
 
-    public function resolve($payload=[],$diffbot){
+    public function resolve($payload=[],$diffbot,$collection = null){
         $multivalued=isset($payload["multivalued"]) ? $payload["multivalued"] : false;
         $args=isset($payload["args"]) ? $payload["args"] : [];
-        $collection=!empty($configs["collection"]) ? $configs["collection"] : null;
+        $isFirstArg=true;
+        $query="";
+        if(isset($args["search"])){
+            $query=$args["search"];
+            unset($args["search"]);
+            $isFirstArg=false;
+        }
+        if (!empty($payload['pipelineParams']['orderBy'])) {
+            $direction = !empty($payload['pipelineParams']['orderByDirection']) && ($payload['pipelineParams']['orderByDirection'] == -'desc') ? "revsortby" : "sortby";
+            $args[$direction]=$payload['pipelineParams']['orderBy'];
+        }
+        $start = !empty($payload['pipelineParams']['start']) ? $payload['pipelineParams']['start'] : null;
+        $limit = !empty($payload['pipelineParams']['limit']) ? $payload['pipelineParams']['limit'] : null;
+        if(!$multivalued){
+            $limit=1;
+        }
+
+        foreach($args as $key=>$value){
+            $prefix=" ";
+            if($isFirstArg){
+                $prefix="";
+                $isFirstArg=false;
+            }
+            $query=$query.$prefix.$key.":".$value;
+        }
+        $search = $diffbot->search($query);
+        if($collection){
+            $search->setCol($collection);
+        }
+        if($start){
+            $search->setStart($start);
+        }
+        if($limit){
+            $search->setNum($limit);
+        }
+        $searchResult=$search->call();
+
         $result=[];
-        throw new Exception('WIP');
+        foreach ($searchResult as $article) {
+            if(!$multivalued){
+                $result=$article->getData();
+            } else {
+                $result[]=$article->getData();
+            }
+        }
         $payload["response"]=$result;
         return $payload;
     }
