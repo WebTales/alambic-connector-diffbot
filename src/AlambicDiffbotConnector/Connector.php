@@ -38,7 +38,7 @@ class Connector
             $isFirstArg=false;
         }
         if (!empty($payload['pipelineParams']['orderBy'])) {
-            $direction = !empty($payload['pipelineParams']['orderByDirection']) && ($payload['pipelineParams']['orderByDirection'] == -'desc') ? "revsortby" : "sortby";
+            $direction = !empty($payload['pipelineParams']['orderByDirection']) && ($payload['pipelineParams']['orderByDirection'] == 'desc') ? "revsortby" : "sortby";
             $args[$direction]=$payload['pipelineParams']['orderBy'];
         }
         $start = !empty($payload['pipelineParams']['start']) ? $payload['pipelineParams']['start'] : null;
