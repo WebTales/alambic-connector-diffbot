@@ -53,7 +53,11 @@ class Connector
                 $prefix="";
                 $isFirstArg=false;
             }
-            $query=$query.$prefix.$key.":".$value;
+            if (is_string($value) && $value!="date") {
+                $query=$query.$prefix.$key.":\"".$value."\"";
+            } else {
+                $query=$query.$prefix.$key.":".$value;
+            }
         }
         $search = $diffbot->search($query);
         if($collection){
