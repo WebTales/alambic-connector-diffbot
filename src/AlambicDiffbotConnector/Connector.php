@@ -1,10 +1,11 @@
 <?php
 
 namespace AlambicDiffbotConnector;
+use Alambic\Exception\ConnectorConfig;
+use Alambic\Exception\ConnectorInternal;
 use Swader\Diffbot\Diffbot;
 
 
-use \Exception;
 
 class Connector
 {
@@ -20,7 +21,7 @@ class Connector
             $collection=$baseConfig["collection"];
         }
         if(empty($baseConfig["token"])&&empty($configs["token"])){
-            throw new Exception('Token required');
+            throw new ConnectorConfig('Token required');
         }
         $token=!empty($configs["token"]) ? $configs["token"] : $baseConfig["token"];
         $diffbot = new Diffbot($token);
@@ -84,6 +85,6 @@ class Connector
     }
 
     public function execute($payload=[],$diffbot){
-        throw new Exception('WIP');
+        throw new ConnectorInternal('WIP');
     }
 }
