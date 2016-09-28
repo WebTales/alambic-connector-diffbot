@@ -31,6 +31,10 @@ class Connector
     public function resolve($payload=[],$diffbot,$collection = null){
         $multivalued=isset($payload["multivalued"]) ? $payload["multivalued"] : false;
         $args=isset($payload["args"]) ? $payload["args"] : [];
+        if(isset($args["collection"])){
+            $collection=$args["collection"];
+            unset($args["collection"]);
+        }
         $isFirstArg=true;
         $query="";
         if(isset($args["search"])){
